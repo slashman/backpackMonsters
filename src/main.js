@@ -1361,7 +1361,6 @@ function update () {
   document.getElementById("energyL").innerHTML = 'AP ' + model.p;
 	document.getElementById("location").innerHTML = locs[model.x][model.y].name;
 	if (!showingBackpack) {
-		document.getElementById("container").innerHTML = '';
 		if (currentMonster) {
 			showMonster(currentMonster, 0, 100, document.getElementById("container"), 1);
 		}
@@ -1436,6 +1435,7 @@ function backpack(highlightId) {
     document.getElementById("bpo").style.display = 'block';
     document.getElementById("message").style.display = 'block';
     document.getElementById("buttons").style.display = 'block';
+    document.getElementById("container").innerHTML = '';
     showMap();
 		update();
 	}
@@ -1551,7 +1551,8 @@ function showMap() {
     document.getElementById('ber').style.display = "none";
     document.getElementById('cat').style.display = "none";
     document.getElementById('run').style.display = "none";
-    document.getElementById("container").style.display = 'none';
+    document.getElementById("container").style.display = 'inline-block';
+    document.getElementById("container").innerHTML = '<span style = "font-size: 128px">' + (locs[model.x][model.y].i == '' ? '🛣️' : locs[model.x][model.y].i) + '</span>';
     msg = map();
     msg += '<br>';
     var n = walkable(model.x,model.y - 1);
