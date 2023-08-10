@@ -1553,6 +1553,7 @@ function walkable(x, y) {
 }
 
 function getMonsterAtLocation() {
+  if (rand.int(100) < 50) return undefined;
 	return rand.of(locs[model.x][model.y].m);
 }
 
