@@ -1427,15 +1427,19 @@ function recoverMP() {
 
 function land() {
 	currentMonster = getMonsterAtLocation();
+  msg = '';
+  if (model.y > 0) msg += locs[model.x][model.y - 1].name + ' to the North.<br>';
+  if (model.y < 9) msg += locs[model.x][model.y + 1].name + ' to the South.<br>';
+  if (model.x > 0) msg += locs[model.x - 1][model.y].name + ' to the West.<br>';
+  if (model.x < 9) msg += locs[model.x + 1][model.y].name + ' to the East.<br>';
 	if (currentMonster) {
-		message('There\'s a ' + currentMonster.name + ' here!');
-	} else {
-		message('Nothing here.');
+		msg += '<br>There\'s a ' + currentMonster.name + ' here!';
 	}
   document.getElementById('n').style.display = model.y == 0 ? "none" : "inline-block";
   document.getElementById('s').style.display = model.y == 9 ? "none" : "inline-block";
   document.getElementById('w').style.display = model.x == 0 ? "none" : "inline-block";
   document.getElementById('e').style.display = model.x == 9 ? "none" : "inline-block";
+  message(msg);
 	update();
 }
 
