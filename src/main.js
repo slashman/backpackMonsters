@@ -1223,6 +1223,7 @@ function catchit() {
   document.getElementById("buttons").style.display = 'none';
 	model.m[currentMonster.id] = true;
 	model.p -= 5;
+  message('');
 	message2('You catch the ' + currentMonster.name + '!');
   const cid = currentMonster.id;
 	currentMonster = false;
@@ -1251,7 +1252,7 @@ function berry() {
   }
   currentMonster.love++;
   if (currentMonster.love > 5) currentMonster.love = 5;
-  msg = 'The ' + currentMonster.name + ' loves the berry!<br>';
+  msg = '<br>The ' + currentMonster.name + ' loves the berry!<br>';
   msg += "You have " + model.berries + " berries";
   message(msg);
 }
@@ -1536,7 +1537,7 @@ function land() {
 function showMap() {
   if (currentMonster) {
     document.getElementById("container").style.display = 'inline-block';
-		msg = 'There\'s a ' + currentMonster.name + ' here!<br>';
+		msg = '<br>There\'s a ' + ((currentMonster.rarity == 'vermin' || currentMonster.rarity == 'common') ? '' : currentMonster.rarity + ' ') + currentMonster.name + ' here!<br>';
     msg += "You have " + model.berries + " berries";
 
     document.getElementById('ber').style.display = "inline-block";
