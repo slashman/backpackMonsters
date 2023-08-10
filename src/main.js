@@ -1123,7 +1123,7 @@ for (let x = 0; x < 10; x++) {
     } else if (icon == 'y') {
       ranloc = ranPlace(dungeonTypes);
     } else {
-      ranloc = {n: 'Route ' + icon, i: '✅'};
+      ranloc = {n: 'Route ' + icon, i: ''};
     }
 		locs[x][y] = { name: ranloc.n, m: [], i: ranloc.i, solid: ranloc.solid, safe: ranloc.safe };
 	}
@@ -1511,7 +1511,7 @@ function map () {
       } else if (model.known[x + '-' + y]) {
         ret += locs[x][y].i;
       } else {
-        ret += '⚪';
+        ret += '☁️';
       }
       ret += '</td>';
     }
