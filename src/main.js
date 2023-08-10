@@ -1033,6 +1033,7 @@ function randomAnatomy() {
 		name: randomName(),
 		type: rands.of(skeletons),
     rarity: rarity(),
+    scale: rands.range(60, 140) / 100,
 		bps: {
       tail: randi(shapes.tail),
 			arm: randi(shapes.arm),
@@ -1290,6 +1291,7 @@ const locRefs = {
 }
 
 function showMonster(anatomy, x, y, container, scale) {
+  scale = anatomy.scale;
 	Object.keys(anatomy.type).forEach(bodyPart => {
 		let xvar = anatomy.type[bodyPart][0];
 		let yvar = anatomy.type[bodyPart][1]; 
@@ -1303,6 +1305,7 @@ function showMonster(anatomy, x, y, container, scale) {
 			createElement(bodyPart, shapes[bodyPart][anatomy.bps[bodyPart]], anatomy.colors, x + xvar, y + yvar, true, container);
 		}
 	});
+  container.style.transform = 'scale('+scale+')';
 }
 
 function update () {
@@ -1338,6 +1341,7 @@ function backpack(highlightId) {
     document.getElementById("buttons").style.display = 'none';
     document.getElementById("message").style.display = 'none';
 		document.getElementById("container").innerHTML = '';
+    document.getElementById("container").style.transform = 'scale(1)';
 		count = 0;
     var label = document.createElement("p");
     document.getElementById("container").appendChild(label);
@@ -1349,12 +1353,19 @@ function backpack(highlightId) {
 			div.style.position = 'relative';
 			div.style.display = 'inline-block';
 			div.style.width = '120px';
-			div.style.height = '180px';
+			div.style.height = '200px';
       div.style.border = '1px solid #333';
       div.style.borderRadius = '10px';
       div.style.margin = '5px';
       div.style.verticalAlign = 'top';
-			showMonster(defs[key], 60, 140, div, 1);
+      var innerDiv = document.createElement("div");
+      innerDiv.style.display = 'inline-block';
+      innerDiv.style.width = '120px';
+			innerDiv.style.height = '160px';
+      innerDiv.style.marginTop = '-50px';
+      innerDiv.style.marginBottom = '50px';
+			showMonster(defs[key], 60, 140, innerDiv, 1);
+      div.appendChild(innerDiv);
       var a = document.createElement("a");
       a.name = 'm'+defs[key].id;
       div.appendChild(a);
