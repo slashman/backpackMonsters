@@ -1142,10 +1142,10 @@ function move(dx, dy) {
 	message('Walking...');
 	document.getElementById("container").innerHTML = '';
 	setTimeout(() => {
-		model.x += dx + 10;
-		model.y += dy + 10;
-		model.x = Math.abs(model.x) % 10;
-		model.y = Math.abs(model.y) % 10;
+		model.x += dx;
+		model.y += dy;
+		model.x = Math.min(Math.max(0, model.x), 9);
+		model.y = Math.min(Math.max(0, model.y), 9);
 		model.p--;
 		save();
 		disable(false);
