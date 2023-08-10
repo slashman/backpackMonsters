@@ -1077,26 +1077,35 @@ for (let i = 0; i < 151; i++) {
 // Worlds model
 
 const locColors = ['Red', 'Blue', 'Yellow', 'Green', 'Cyan', 'Magenta', 'Saffron', 'Obsidian', 'Viridian'];
-const locTypes = [
-  {n: 'Pond', i: '🏊'},
-  {n: 'Forest', i: '🌲'},
-  {n: 'Lake', i: '🚤'},
+const cityTypes = [
   {n: 'Town', i: '🏠'},
-  {n: 'Cave', i: '⛰️'},
-  {n: 'City', i: '🏙️'},
+  {n: 'City', i: '🏙️'}
+];
+const dungeonTypes = [
+  {n: 'Forest', i: '🌲'},
   {n: 'Shrine', i: '⛩️'},
   {n: 'Temple', i: '🏛️'},
   {n: 'Tower', i: '🛕'},
-  {n: 'Lagoon', i: '🌊'},
   {n: 'Mountain', i: '🌄'}
 ];
+const baseMap = [
+  'yBBx777x88',
+  '   4   1 8',
+  ' x44   1 y',
+  ' 9 4   1  ',
+  ' 99y333x22',
+  ' 9 6     2',
+  ' x 6  y  2',
+  'AAy66x555x',
+  'x    C    ',
+  'BBBxCCCCy ',
+]
 let roadCount = 1;
-function locName() {
+function ranPlace(locTypes) {
   ranType = rands.of(locTypes)
-	switch (rands.int(3)) {
+	switch (rands.int(2)) {
 		case 0: return {n: rands.of(locColors) + ' ' + ranType.n, i: ranType.i };
 		case 1: return {n: ranType.n + ' of ' + randomName(), i: ranType.i };
-		case 2: return {n: 'Road ' + roadCount++, i: '✅'};
 	}
 	return rands.of(locTypes)
 }
@@ -1105,15 +1114,30 @@ const locs = [];
 for (let x = 0; x < 10; x++) {
 	locs[x] = []
 	for (let y = 0; y < 10; y++) {
-    ranloc = locName();
-		locs[x][y] = { name: ranloc.n, m: [], i: ranloc.i };
+    var icon = baseMap[y].charAt(x);
+    if (icon == ' ') {
+      ranloc = { i: '⛰️', solid: true };
+    } else if (icon == 'x') {
+      ranloc = ranPlace(cityTypes);
+    } else if (icon == 'y') {
+      ranloc = ranPlace(dungeonTypes);
+    } else {
+      ranloc = {n: 'Route ' + icon, i: '✅'};
+    }
+		locs[x][y] = { name: ranloc.n, m: [], i: ranloc.i, solid: ranloc.solid };
 	}
 }
 
 function scatterDef(def) {
-	const x = rands.range(0, 9);
-	const y = rands.range(0, 9);
-	locs[x][y].m.push(def);
+  while (true) {
+    const x = rands.range(0, 9);
+    const y = rands.range(0, 9);
+    if (locs[x][y].solid) {
+      continue;
+    }
+    locs[x][y].m.push(def);
+    break;
+  }
 }
 
 function scatter(rarity, times) {
