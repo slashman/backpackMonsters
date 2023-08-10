@@ -1470,7 +1470,7 @@ function restoreGame() {
 	}
   currentVersion = 2;
 	if (!model || model.version != currentVersion) {
-		model = { x: 7, y: 4, p: 40, m: {}, lastGrant: +new Date(), known: {}, berries: 0, currentVersion: currentVersion };
+		model = { x: 7, y: 4, p: 40, m: {}, lastGrant: +new Date(), known: {}, berries: 0, version: currentVersion };
 	}
 }
 
