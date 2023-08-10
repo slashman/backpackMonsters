@@ -1076,13 +1076,26 @@ for (let i = 0; i < 151; i++) {
 // Worlds model
 
 const locColors = ['Red', 'Blue', 'Yellow', 'Green', 'Cyan', 'Magenta', 'Saffron', 'Obsidian', 'Viridian'];
-const locTypes = ['Pond', 'Forest', 'Lake', 'Town', 'Cave', 'City', 'Shrine', 'Temple', 'Tower', 'Lagoon', 'Mountain'];
+const locTypes = [
+  {n: 'Pond', i: '🏊'},
+  {n: 'Forest', i: '🌲'},
+  {n: 'Lake', i: '🚤'},
+  {n: 'Town', i: '🏠'},
+  {n: 'Cave', i: '⛰️'},
+  {n: 'City', i: '🏙️'},
+  {n: 'Shrine', i: '⛩️'},
+  {n: 'Temple', i: '🏛️'},
+  {n: 'Tower', i: '🛕'},
+  {n: 'Lagoon', i: '🌊'},
+  {n: 'Mountain', i: '🌄'}
+];
 let roadCount = 1;
 function locName() {
+  ranType = rands.of(locTypes)
 	switch (rands.int(3)) {
-		case 0: return rands.of(locColors) + ' ' + rands.of(locTypes);
-		case 1: return rands.of(locTypes) + ' of ' + randomName();
-		case 2: return 'Road ' + roadCount++;
+		case 0: return {n: rands.of(locColors) + ' ' + ranType.n, i: ranType.i };
+		case 1: return {n: ranType.n + ' of ' + randomName(), i: ranType.i };
+		case 2: return {n: 'Road ' + roadCount++, i: '✅'};
 	}
 	return rands.of(locTypes)
 }
@@ -1091,7 +1104,8 @@ const locs = [];
 for (let x = 0; x < 10; x++) {
 	locs[x] = []
 	for (let y = 0; y < 10; y++) {
-		locs[x][y] = { name: locName(), m: [] };
+    ranloc = locName();
+		locs[x][y] = { name: ranloc.n, m: [], i: ranloc.i };
 	}
 }
 
@@ -1134,12 +1148,12 @@ function setupUI() {
 
 function move(dx, dy) {
 	if (model.p < 1) {
-		message('Not enough action points');
+		message2('Not enough action points');
 		return;
 	}
 	showingBackpack = false;
 	disable(true);
-	message('Walking...');
+	message2('Walking...');
 	document.getElementById("container").innerHTML = '';
 	setTimeout(() => {
 		model.x += dx;
@@ -1160,19 +1174,19 @@ function catchit() {
 		backpack();
 	}
 	if (!currentMonster) {
-		message('Nothing to catch!');
+		message2('Nothing to catch!');
 		return;
 	}
 	if (model.p < 5) {
-		message('You need 5 AP to attempt capturing the monster. Wait for them to recover!');
+		message2('You need 5 AP to attempt capturing the monster. Wait for them to recover!', 5000);
 		return;
 	}
 	if (model.m[currentMonster.id]) {
-		message('You already have this monster.');
+		message2('You already have this monster.');
 		return;
 	}
   if (rand.int(100) > getChance(currentMonster.rarity)) {
-    message('You failed!');
+    message2('You failed!');
     model.p -= 5;
     save();
     update();
@@ -1181,17 +1195,16 @@ function catchit() {
   document.getElementById("buttons").style.display = 'none';
 	model.m[currentMonster.id] = true;
 	model.p -= 5;
-	message('You catch the ' + currentMonster.name + '!');
+	message2('You catch the ' + currentMonster.name + '!');
   const cid = currentMonster.id;
 	currentMonster = false;
 
 	save();
 	update();
   setTimeout(() => {
-    message('');
     backpack(cid);
     disable(false);
-  }, 2000);
+  }, 1000);
 }
 
 function getChance(rarity) {
@@ -1307,12 +1320,13 @@ function message(m) {
 	document.getElementById("message").innerHTML = m;
 }
 
-function message2(m) {
+function message2(m, time) {
+  if (!time) time = 1000;
   document.getElementById("cmessage").innerHTML = m;
   document.getElementById("cmessage").style.display = 'block';
   setTimeout(() => { 
     document.getElementById("cmessage").style.display = 'none';
-  }, 5000);
+  }, time);
 }
 
 let showingBackpack = false;
@@ -1361,6 +1375,7 @@ function backpack(highlightId) {
     document.getElementById("bpo").style.display = 'block';
     document.getElementById("message").style.display = 'block';
     document.getElementById("buttons").style.display = 'block';
+    showMap();
 		update();
 	}
 }
@@ -1394,8 +1409,8 @@ function restoreGame() {
 	}
 
 	if (!model) {
-		model = { x: 5, y: 5, p: 40, m: {}, lastGrant: +new Date() };
-	}
+		model = { x: 5, y: 5, p: 40, m: {}, lastGrant: +new Date(), known: {} };
+	} else if (!model.known) model.known = {};
 }
 
 function save() {
@@ -1425,9 +1440,38 @@ function recoverMP() {
 	}
 }
 
+function map () {
+  ret = '<table id = "mapTable">';
+  for (y = 0; y < 10; y++) {
+    ret += '<tr>';
+    for (x = 0; x < 10; x++) {
+      ret += '<td style = "background-color: ' + (Math.abs(x - model.x) + Math.abs(y - model.y) < 2 ? 'gray' : 'white') + '">';
+      if (x == model.x && y == model.y) {
+        ret += "🧍";
+      } else if (model.known[x + '-' + y]) {
+        ret += locs[x][y].i;
+      } else {
+        ret += '❔';
+      }
+      ret += '</td>';
+    }
+    ret += '</tr>';
+  }
+  ret += '</table>';
+  return ret;
+}
+
 function land() {
 	currentMonster = getMonsterAtLocation();
-  msg = '';
+  model.known[(model.x-1)+'-'+model.y] = true;
+  model.known[(model.x+1)+'-'+model.y] = true;
+  model.known[(model.x)+'-'+(model.y-1)] = true;
+  model.known[(model.x)+'-'+(model.y+1)] = true;
+  showMap();
+}
+
+function showMap() {
+  msg = map();
   if (model.y > 0) msg += locs[model.x][model.y - 1].name + ' to the North.<br>';
   if (model.y < 9) msg += locs[model.x][model.y + 1].name + ' to the South.<br>';
   if (model.x > 0) msg += locs[model.x - 1][model.y].name + ' to the West.<br>';
