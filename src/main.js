@@ -1167,6 +1167,7 @@ function setupUI() {
   addButton('w', 'West', () => move(-1, 0));
   addButton('e', 'East', () => move(1, 0));
   buttonsContainer.appendChild(document.createElement('br'));
+  addButton('ber', 'Throw Berry', () => berry());
 	addButton('cat', 'Catch', () => catchit());
   addButton('run', 'Run Away', () => runAway());
   buttonsContainer.appendChild(document.createElement('br'));
@@ -1212,7 +1213,7 @@ function catchit() {
 		message2('You already have this monster.');
 		return;
 	}
-  if (rand.int(100) > getChance(currentMonster.rarity)) {
+  if (rand.int(100) > getChance(currentMonster.rarity) + currentMonster.love * 5) {
     message2('You failed!');
     model.p -= 5;
     save();
@@ -1238,6 +1239,21 @@ function runAway() {
 	currentMonster = false;
 	save();
   showMap();
+}
+
+function berry() {
+  if (model.berries > 0) {
+    model.berries--;
+  } else {
+    msg = "You have no berries left.";
+    message(msg);
+    return;
+  }
+  currentMonster.love++;
+  if (currentMonster.love > 5) currentMonster.love = 5;
+  msg = 'The ' + currentMonster.name + ' loves the berry!<br>';
+  msg += "You have " + model.berries + " berries";
+  message(msg);
 }
 
 function getChance(rarity) {
@@ -1451,10 +1467,10 @@ function restoreGame() {
 			model = JSON.parse(model);
 		} catch (e) {}
 	}
-
-	if (!model) {
-		model = { x: 7, y: 4, p: 40, m: {}, lastGrant: +new Date(), known: {} };
-	} else if (!model.known) model.known = {};
+  currentVersion = 2;
+	if (!model || model.version != currentVersion) {
+		model = { x: 7, y: 4, p: 40, m: {}, lastGrant: +new Date(), known: {}, berries: 0, currentVersion: currentVersion };
+	}
 }
 
 function save() {
@@ -1511,13 +1527,19 @@ function land() {
   model.known[(model.x+1)+'-'+model.y] = true;
   model.known[(model.x)+'-'+(model.y-1)] = true;
   model.known[(model.x)+'-'+(model.y+1)] = true;
+  if (locs[model.x][model.y].safe) {
+    model.berries++;
+  }
   showMap();
 }
 
 function showMap() {
   if (currentMonster) {
     document.getElementById("container").style.display = 'inline-block';
-		message ('There\'s a ' + currentMonster.name + ' here!');
+		msg = 'There\'s a ' + currentMonster.name + ' here!<br>';
+    msg += "You have " + model.berries + " berries";
+
+    document.getElementById('ber').style.display = "inline-block";
     document.getElementById('cat').style.display = "inline-block";
     document.getElementById('run').style.display = "inline-block";
     document.getElementById('n').style.display = "none";
@@ -1525,6 +1547,7 @@ function showMap() {
     document.getElementById('w').style.display = "none";
     document.getElementById('e').style.display = "none";
 	} else {
+    document.getElementById('ber').style.display = "none";
     document.getElementById('cat').style.display = "none";
     document.getElementById('run').style.display = "none";
     document.getElementById("container").style.display = 'none';
@@ -1538,13 +1561,14 @@ function showMap() {
     if (s) msg += locs[model.x][model.y + 1].name + ' to the South.<br>';
     if (w) msg += locs[model.x - 1][model.y].name + ' to the West.<br>';
     if (e) msg += locs[model.x + 1][model.y].name + ' to the East.<br>';
+    msg += "You have " + model.berries + " berries";
     
     document.getElementById('n').style.display = !n ? "none" : "inline-block";
     document.getElementById('s').style.display = !s ? "none" : "inline-block";
     document.getElementById('w').style.display = !w ? "none" : "inline-block";
     document.getElementById('e').style.display = !e ? "none" : "inline-block";
-    message(msg);
   }
+  message(msg);
 	update();
 }
 
@@ -1554,7 +1578,9 @@ function walkable(x, y) {
 
 function getMonsterAtLocation() {
   if (rand.int(100) < 50) return undefined;
-	return rand.of(locs[model.x][model.y].m);
+	monster = rand.of(locs[model.x][model.y].m);
+  if (monster) monster.love = 0;
+  return monster;
 }
 
 function init() {
