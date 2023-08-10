@@ -1373,6 +1373,7 @@ function backpack(highlightId) {
     document.getElementById("message").style.display = 'none';
 		document.getElementById("container").innerHTML = '';
     document.getElementById("container").style.transform = 'scale(1)';
+    document.getElementById("container").style.display = 'inline-block';
 		count = 0;
     var label = document.createElement("p");
     document.getElementById("container").appendChild(label);
