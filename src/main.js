@@ -1452,7 +1452,7 @@ function restoreGame() {
 	}
 
 	if (!model) {
-		model = { x: 5, y: 5, p: 40, m: {}, lastGrant: +new Date(), known: {} };
+		model = { x: 7, y: 4, p: 40, m: {}, lastGrant: +new Date(), known: {} };
 	} else if (!model.known) model.known = {};
 }
 
