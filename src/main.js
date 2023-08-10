@@ -1119,12 +1119,13 @@ for (let x = 0; x < 10; x++) {
       ranloc = { i: '⛰️', solid: true };
     } else if (icon == 'x') {
       ranloc = ranPlace(cityTypes);
+      ranloc.safe = true;
     } else if (icon == 'y') {
       ranloc = ranPlace(dungeonTypes);
     } else {
       ranloc = {n: 'Route ' + icon, i: '✅'};
     }
-		locs[x][y] = { name: ranloc.n, m: [], i: ranloc.i, solid: ranloc.solid };
+		locs[x][y] = { name: ranloc.n, m: [], i: ranloc.i, solid: ranloc.solid, safe: ranloc.safe };
 	}
 }
 
@@ -1132,7 +1133,7 @@ function scatterDef(def) {
   while (true) {
     const x = rands.range(0, 9);
     const y = rands.range(0, 9);
-    if (locs[x][y].solid) {
+    if (locs[x][y].solid || locs[x][y].safe)  {
       continue;
     }
     locs[x][y].m.push(def);
