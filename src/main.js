@@ -1493,7 +1493,7 @@ function map () {
       } else if (model.known[x + '-' + y]) {
         ret += locs[x][y].i;
       } else {
-        ret += '❔';
+        ret += '';
       }
       ret += '</td>';
     }
