@@ -1115,19 +1115,21 @@ scatter('vermin', 10);
 
 function setupUI() {
 	const buttonsContainer = document.getElementById('buttons');
-	function addButton(label, cb) {
+	function addButton(id, label, cb) {
 		var button = document.createElement("button");
 		button.innerHTML = label;
-		buttonsContainer.appendChild(button);
+    buttonsContainer.appendChild(button);
+    button.id = id;
 		button.addEventListener("click", cb);
 	}
+  addButton('n', 'North', () => move(0, -1));
+  addButton('s', 'South', () => move(0, 1));
+  addButton('w', 'West', () => move(-1, 0));
+  addButton('e', 'East', () => move(1, 0));
+  buttonsContainer.appendChild(document.createElement('br'));
 
-	addButton('North', () => move(0, -1));
-	addButton('South', () => move(0, 1));
-	addButton('West', () => move(-1, 0));
-	addButton('East', () => move(1, 0));
-	addButton('Catch', () => catchit());
-  addButton('Toggle Sound', () => toggleSound());
+	addButton('c', 'Catch', () => catchit());
+  addButton('sou', 'Toggle Sound', () => toggleSound());
 }
 
 function move(dx, dy) {
@@ -1146,8 +1148,8 @@ function move(dx, dy) {
 		model.y = Math.abs(model.y) % 10;
 		model.p--;
 		save();
-		land();
 		disable(false);
+    land();
 	}, 1000);
 }
 
@@ -1430,6 +1432,10 @@ function land() {
 	} else {
 		message('Nothing here.');
 	}
+  document.getElementById('n').style.display = model.y == 0 ? "none" : "inline-block";
+  document.getElementById('s').style.display = model.y == 9 ? "none" : "inline-block";
+  document.getElementById('w').style.display = model.x == 0 ? "none" : "inline-block";
+  document.getElementById('e').style.display = model.x == 9 ? "none" : "inline-block";
 	update();
 }
 
