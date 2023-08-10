@@ -1166,8 +1166,9 @@ function setupUI() {
   addButton('w', 'West', () => move(-1, 0));
   addButton('e', 'East', () => move(1, 0));
   buttonsContainer.appendChild(document.createElement('br'));
-
-	addButton('c', 'Catch', () => catchit());
+	addButton('cat', 'Catch', () => catchit());
+  addButton('run', 'Run Away', () => runAway());
+  buttonsContainer.appendChild(document.createElement('br'));
   addButton('sou', 'Toggle Sound', () => toggleSound());
 }
 
@@ -1230,6 +1231,12 @@ function catchit() {
     backpack(cid);
     disable(false);
   }, 1000);
+}
+
+function runAway() {
+	currentMonster = false;
+	save();
+  showMap();
 }
 
 function getChance(rarity) {
@@ -1506,20 +1513,41 @@ function land() {
 }
 
 function showMap() {
-  msg = map();
-  if (model.y > 0) msg += locs[model.x][model.y - 1].name + ' to the North.<br>';
-  if (model.y < 9) msg += locs[model.x][model.y + 1].name + ' to the South.<br>';
-  if (model.x > 0) msg += locs[model.x - 1][model.y].name + ' to the West.<br>';
-  if (model.x < 9) msg += locs[model.x + 1][model.y].name + ' to the East.<br>';
-	if (currentMonster) {
-		msg += '<br>There\'s a ' + currentMonster.name + ' here!';
-	}
-  document.getElementById('n').style.display = model.y == 0 ? "none" : "inline-block";
-  document.getElementById('s').style.display = model.y == 9 ? "none" : "inline-block";
-  document.getElementById('w').style.display = model.x == 0 ? "none" : "inline-block";
-  document.getElementById('e').style.display = model.x == 9 ? "none" : "inline-block";
-  message(msg);
+  if (currentMonster) {
+    document.getElementById("container").style.display = 'inline-block';
+		message ('There\'s a ' + currentMonster.name + ' here!');
+    document.getElementById('cat').style.display = "inline-block";
+    document.getElementById('run').style.display = "inline-block";
+    document.getElementById('n').style.display = "none";
+    document.getElementById('s').style.display = "none";
+    document.getElementById('w').style.display = "none";
+    document.getElementById('e').style.display = "none";
+	} else {
+    document.getElementById('cat').style.display = "none";
+    document.getElementById('run').style.display = "none";
+    document.getElementById("container").style.display = 'none';
+    msg = map();
+    msg += '<br>';
+    var n = walkable(model.x,model.y - 1);
+    var s = walkable(model.x,model.y + 1);
+    var w = walkable(model.x - 1,model.y);
+    var e = walkable(model.x + 1,model.y);
+    if (n) msg += locs[model.x][model.y - 1].name + ' to the North.<br>';
+    if (s) msg += locs[model.x][model.y + 1].name + ' to the South.<br>';
+    if (w) msg += locs[model.x - 1][model.y].name + ' to the West.<br>';
+    if (e) msg += locs[model.x + 1][model.y].name + ' to the East.<br>';
+    
+    document.getElementById('n').style.display = !n ? "none" : "inline-block";
+    document.getElementById('s').style.display = !s ? "none" : "inline-block";
+    document.getElementById('w').style.display = !w ? "none" : "inline-block";
+    document.getElementById('e').style.display = !e ? "none" : "inline-block";
+    message(msg);
+  }
 	update();
+}
+
+function walkable(x, y) {
+  return x >= 0 && y >= 0 && x < 10 && y < 10 && !locs[x][y].solid;
 }
 
 function getMonsterAtLocation() {
